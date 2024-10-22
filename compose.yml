@@ -1,0 +1,120 @@
+services:
+  oracle-db:
+    image: oracle/database:18.4.0-xe
+    ports:
+      - 1521:1521 # Oracle listener
+      # - 5500:5500 # OEM Express　※18cには無い？https://localhost:5500/em/で接続できず
+      # - 2484:2484 # TCPS Listener Port if TCPS is enabled
+    environment:
+      # The Oracle Database SID that should be used (default for 23ai Free Edition: FREE; all others, ORCLCDB).
+      # Note: The ORACLE_SID for 11g/18c Express and 23ai Free Editions cannot be changed.
+      # 使用するOracle DatabaseのSID（23ai Free EditionのデフォルトはFREE、その他はORCLCDB）。
+      # 注意: 11g/18c Express Editionおよび23ai Free EditionのORACLE_SIDは変更できません。
+      # - ORACLE_SID=ORCLCDB
+      # ※18cは XE 固定
+
+      # The Oracle Database PDB name that should be used (default for 23ai Free Edition: FREEPDB1; all others, ORCLPDB1).
+      # Note: The ORACLE_PDB for 23ai Free Edition cannot be changed.
+      # 使用するOracle Database PDB名（23ai Free Editionのデフォルト：FREEPDB1、その他はORCLPDB1）。
+      # 注意: 23ai Free EditionのORACLE_PDBは変更できません。
+      # - ORACLE_PDB=ORCLPDB1
+      # ※18cは XEPDB1 固定っぽい
+      
+      # The Oracle Database SYS, SYSTEM and PDBADMIN password (default: auto generated).
+      # Oracle Database の SYS、SYSTEM、PDBADMIN のパスワード（デフォルト：自動生成）。
+      - ORACLE_PWD=password
+
+      # The total memory in MB that should be used for all SGA components (optional).
+      # Supported by Oracle Database 19.3 onwards.
+      # すべての SGA コンポーネントに使用するべき合計メモリ（MB単位）（オプション）。
+      # Oracle Database 19.3 以降でサポートされています。
+      # - INIT_SGA_SIZE=XXX
+
+      # The target aggregate PGA memory in MB that should be used for all server processes attached to the instance (optional).
+      # Supported by Oracle Database 19.3 onwards.
+      # インスタンスにアタッチされているすべてのサーバー・プロセスに使用される、MB 単位の目標集約 PGA メモリ (オプション)。
+      # Oracle Database 19.3 以降でサポートされています。
+      # - INIT_PGA_SIZE=XXX
+
+      # Specifies the number of CPUs available for Oracle Database to use. 
+      # On CPUs with multiple CPU threads, it specifies the total number of available CPU threads (optional).
+      # Oracle Database が使用可能な CPU 数を指定します。
+      # 複数のCPUスレッドを持つCPUでは、利用可能なCPUスレッドの総数を指定する（オプション）。
+      # - INIT_CPU_COUNT=XXX
+
+      # Specifies the maximum number of operating system user processes that can simultaneously connect to Oracle Database. 
+      # Its value should allow for all background processes such as locks, job queue processes, and parallel execution processes (optional).
+      # Oracle Database に同時に接続できるオペレーティング・システム・ユーザー・プロセスの最大数を指定します。
+      # この値は、ロック、ジョブ・キュー・プロセス、並列実行プロセス（オプション）など、すべてのバックグラウンド・プロセスを許容すべきである。
+      # - INIT_PROCESSES=XXX
+
+      # To enable auto calculation of the DBCA total memory limit during the database creation, based on
+      # the available memory of the container, which can be constrained using the `docker run --memory` option.
+      # If set to 'false', the total memory will be set as 2GB (default: true).
+      # Note that this parameter is not taken into account if the `-e INIT_SGA_SIZE` or `-e INIT_PGA_SIZE` are set.
+      # Supported by Oracle Database 19.3 onwards.
+      # データベース作成時に、コンテナの利用可能なメモリに基づいて DBCA の総メモリ制限を自動計算するには、
+      # docker run --memory オプションを使用してメモリを制限することができます。
+      # 'false' に設定した場合、総メモリは2GBに設定されます（デフォルト: true）。
+      # なお、-e INIT_SGA_SIZE または -e INIT_PGA_SIZE が設定されている場合、このパラメータは無視されます。
+      # Oracle Database 19.3 以降でサポートされています。
+      # - AUTO_MEM_CALCULATION=XXX
+
+      # The Oracle Database Edition (enterprise/standard).
+      # Supported by Oracle Database 19.3 onwards.
+      # Oracle Database Edition（エンタープライズ/スタンダード）。
+      # Oracle Database 19.3 以降でサポートされています。
+      # - ORACLE_EDITION=XXX
+
+      # The character set to use when creating the database (default: AL32UTF8).
+      # データベース作成時に使用する文字セット（デフォルト: AL32UTF8）。
+      # - ORACLE_CHARACTERSET=XXX
+
+      # To enable archive log mode when creating the database (default: false).
+      # Supported by Oracle Database 19.3 onwards.
+      # データベース作成時にアーカイブログモードを有効にする（デフォルト: false）。
+      # Oracle Database 19.3 以降でサポートされています。
+      # - ENABLE_ARCHIVELOG=XXX
+
+      # To enable force logging mode when creating the database (default: false).
+      # Supported by Oracle Database 23ai onwards.
+      # データベース作成時に強制ロギングモードを有効にする（デフォルト: false）。
+      # Oracle Database 23c以降でサポートされています。
+      # - ENABLE_FORCE_LOGGING=XXX
+
+      # To enable TCPS connections for Oracle Database.
+      # Supported by Oracle Database 19.3 onwards.
+      # Oracle DatabaseでTCPS接続を有効にする。  
+      # Oracle Database 19.3以降でサポートされています。
+      # - ENABLE_TCPS=XXX
+
+      # Location of user provided SSL certificates for TCPS connection
+      # Supported by Oracle Database 19.3 onwards.
+      # TCPS接続用のユーザー提供のSSL証明書の場所  
+      # Oracle Database 19.3以降でサポートされています。
+      # - TCPS_CERTS_LOCATION=XXX
+
+    volumes:
+      # The data volume to use for the database.
+      # Has to be writable by the Unix "oracle" (uid: 54321) user inside the container.
+      # If omitted the database will not be persisted over container recreation.
+      # データベースで使用するデータボリューム  
+      # コンテナ内でUnixユーザー「oracle」（uid: 54321）が書き込み可能である必要があります。  
+      # 指定しない場合、データベースはコンテナの再作成後も保持されません。
+      - oradata:/opt/oracle/oradata
+
+      # Optional: A volume with custom scripts to be run after database startup.
+      # 任意: データベース起動後に実行するカスタムスクリプトを含むボリューム  
+      # - ./startup:/opt/oracle/scripts/startup
+      # - ./startup:/docker-entrypoint-initdb.d/startup
+
+      # Optional: A volume with custom scripts to be run after database setup.
+      # 任意: データベースセットアップ後に実行するカスタムスクリプトを含むボリューム  
+      # - ./setup:/opt/oracle/scripts/setup
+      # - ./setup:/docker-entrypoint-initdb.d/setup
+
+      # バックアップファイル格納先
+      - ./backup:/backup 
+
+volumes:
+  oradata:
