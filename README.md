@@ -147,7 +147,7 @@ $ docker compose up
  ✔ Volume "docker_oracle_example1_oradata"       Created                                                                                                                                                          0.0s 
  ✔ Container docker_oracle_example1-oracle-db-1  Created                                                                                                                                                          0.1s 
 Attaching to oracle-db-1
-oracle-db-1  | ORACLE PASSWORD FOR SYS AND SYSTEM: oracle
+oracle-db-1  | ORACLE PASSWORD FOR SYS AND SYSTEM: password
 oracle-db-1  | Specify a password to be used for database accounts. Oracle recommends that the password entered should be at least 8 characters in length, contain at least 1 uppercase character, 1 lower case character and 1 digit [0-9]. Note that the same password will be used for SYS, SYSTEM and PDBADMIN accounts:
 oracle-db-1  | Confirm the password:
 oracle-db-1  | Configuring Oracle Listener.
@@ -241,11 +241,47 @@ oracle-db-1  | ===========================================================
 
 ```
 docker compose exec oracle-db bash
-sqlplus system/password
+
+# sqlplus / as sysdba ※ERROR:ORA-12547: TNS:lost contact
+sqlplus sys/password@XEPDB1 as sysdba
+sqlplus sys/password@XEPDB1 as sysoper
+sqlplus system/password@XEPDB1
+sqlplus pdbadmin/password@XEPDB1
+
+SELECT TABLE_NAME FROM USER_TABLES;
+```
+
+```
+cd /backup
+rman target / cmdfile=/backup/backup_script.rman log=/backup/backup_log.txt　※エラー
+
+rman target sys/password@XEPDB1 cmdfile=/backup/backup_script.rman log=/backup/backup_log.txt
+
+```
+
+```
+sqlplus sys/password@XEPDB1 as sysdba
+SQL> shutdown immediate;
+
+rman target sys/password@XEPDB1 cmdfile=/backup/backup_script.rman log=/backup/backup_log.txt
+
+sqlplus sys/password@XEPDB1 as sysdba
+SQL> startup;
+
+```
+
+```
+rman target sys/password@XEPDB1 cmdfile=/backup/restore_script.rman log=/backup/restore_log.txt
 ```
 
 ```
 expdp system/oracle@XEPDB1 schemas=your_schema \
     directory=DATA_PUMP_DIR dumpfile=your_schema.dmp logfile=export.log
 
+```
+
+```
+CREATE TABLE employees (id NUMBER PRIMARY KEY,name VARCHAR2(50),age NUMBER);
+SELECT * FROM employees;
+INSERT INTO employees (id, name, age) VALUES (1, '山田 太郎', 30);
 ```

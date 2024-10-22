@@ -1,0 +1,10 @@
+RUN {
+    shutdown immediate;
+    startup nomount;
+    RESTORE CONTROLFILE TO '/path/to/controlfile.ctl' 
+      FROM '/backup/db_02388dd9_1_1.bak';
+    ALTER DATABASE MOUNT;
+    RESTORE DATABASE;
+    RECOVER DATABASE;
+    ALTER DATABASE OPEN RESETLOGS;
+}
