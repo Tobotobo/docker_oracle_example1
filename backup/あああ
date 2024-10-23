@@ -1,0 +1,22 @@
+# # CDBに接続してPDBを停止およびマウント状態にする
+# sqlplus ${user_name}/${user_pass}@${cdb_name} as sysdba <<EOF
+# -- PDBの停止
+# ALTER PLUGGABLE DATABASE ${pdb_name} CLOSE IMMEDIATE;
+# -- PDBのマウント状態に設定
+# ALTER PLUGGABLE DATABASE ${pdb_name} OPEN READ ONLY;
+# EXIT;
+# EOF
+
+# # PDBをバックアップ
+# rman target ${user_name}/${user_pass}@${cdb_name} <<EOF
+# RUN {
+#     BACKUP PLUGGABLE DATABASE ${pdb_name} FORMAT '/backup/${pdb_name}_%U.bak';
+# }
+# EOF > /backup/backup_log.txt 2>&1
+
+# # CDBに接続してPDBを再起動
+# sqlplus ${user_name}/${user_pass}@${cdb_name} as sysdba <<EOF
+# -- PDBを通常の状態でオープン
+# ALTER PLUGGABLE DATABASE ${pdb_name} OPEN;
+# EXIT;
+# EOF

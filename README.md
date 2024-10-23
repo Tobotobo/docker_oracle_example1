@@ -243,7 +243,13 @@ oracle-db-1  | ===========================================================
 docker compose exec oracle-db bash
 
 # sqlplus / as sysdba ※ERROR:ORA-12547: TNS:lost contact
+
+# CDB に接続する場合
+sqlplus sys/password@XE as sysdba
+
+# PDB に接続する場合
 sqlplus sys/password@XEPDB1 as sysdba
+
 sqlplus sys/password@XEPDB1 as sysoper
 sqlplus system/password@XEPDB1
 sqlplus pdbadmin/password@XEPDB1
@@ -260,6 +266,7 @@ rman target sys/password@XEPDB1 cmdfile=/backup/backup_script.rman log=/backup/b
 ```
 
 ```
+
 sqlplus sys/password@XEPDB1 as sysdba
 SQL> shutdown immediate;
 
@@ -275,8 +282,8 @@ rman target sys/password@XEPDB1 cmdfile=/backup/restore_script.rman log=/backup/
 ```
 
 ```
-expdp system/oracle@XEPDB1 schemas=your_schema \
-    directory=DATA_PUMP_DIR dumpfile=your_schema.dmp logfile=export.log
+expdp system/password@XEPDB1 schemas=system \
+    directory=/backup/export dumpfile=your_schema.dmp logfile=export.log
 
 ```
 
@@ -285,3 +292,7 @@ CREATE TABLE employees (id NUMBER PRIMARY KEY,name VARCHAR2(50),age NUMBER);
 SELECT * FROM employees;
 INSERT INTO employees (id, name, age) VALUES (1, '山田 太郎', 30);
 ```
+
+Oracle Database 12cを使ってみよう  
+マルチテナント・アーキテクチャ編 第3回　バックアップ＆リカバリ  
+https://www.oracle.com/jp/technical-resources/articles/jissenn12c/jissen12c-03.html
